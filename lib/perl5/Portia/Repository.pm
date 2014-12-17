@@ -3,8 +3,6 @@ use base qw( iTools::Core::Accessor HashRef::Maskable );
 
 use Data::Dumper; $Data::Dumper::Indent=1; $Data::Dumper::Sortkeys=1; # for debugging only
 
-use feature qw( switch );
-
 use iTools::File qw( readfile );
 use iTools::System qw( nofatal mkdir pushdir popdir system );
 use iTools::Term::ANSI qw( color );
@@ -16,6 +14,10 @@ use Portia::Tools qw( indent match );
 
 use strict;
 use warnings;
+
+# --- remove warnings for switch in Perl >= 5.18 ---
+#! TODO: need to watch if this feature is deprecaated in future versions of Perl
+use feature qw( switch ); no if $] >= 5.018, warnings => "experimental::smartmatch";
 
 # === Constructor and Construtor-like Methods ===============================
 # --- new, blank object ---

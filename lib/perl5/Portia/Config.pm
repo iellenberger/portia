@@ -3,8 +3,6 @@ use base qw( iTools::Core::Accessor HashRef::Maskable );
 
 use Data::Dumper; $Data::Dumper::Indent=$Data::Dumper::Sortkeys=$Data::Dumper::Terse=1; # for debugging only
 
-use feature qw( switch );
-
 use Config;
 use Cwd qw( abs_path );
 use FindBin qw( $Bin $RealBin $Script );
@@ -16,6 +14,10 @@ use Storable qw( dclone );
 
 use strict;
 use warnings;
+
+# --- remove warnings for switch in Perl >= 5.18 ---
+#! TODO: need to watch if this feature is deprecaated in future versions of Perl
+use feature qw( switch ); no if $] >= 5.018, warnings => "experimental::smartmatch";
 
 # === Class-Level Declarations ==============================================
 # --- persistant instance of object ---
