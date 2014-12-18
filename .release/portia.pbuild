@@ -6,7 +6,7 @@ PACKAGE=portia
 VERSION=0.1.0
 REVISION="unstable"
 
-DESCRIPTION="Ports inspired packagement management system"
+DESCRIPTION="Ports inspired package management system"
 LONGDESC="
 	Portia is a package management system inspired by BSD Ports and Gentoo Portage.
 	It is a lightweight package managemnt solution that allows organizations to
