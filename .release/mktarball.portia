@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# --- core variables ---
+ROOTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. && pwd )"
+
+# --- CLI params ---
+VERSION=$1
+if [ $# -ne 1 ]; then VERSION=$( $ROOTDIR/bin/portia --version ); fi
+
+# --- set a few vars ---
+PACKAGE=portia
+PV=$PACKAGE-$VERSION
+TMPDIR=$ROOTDIR/tmp/release-$PACKAGE-$$
+RELEASEDIR=$ROOTDIR/var/releases
+TARBALL=$RELEASEDIR/$PACKAGE-$VERSION.tgz
+
+# --- list of files/dirs to be included in the release ---
+FILES="
+	LICENSE
+	bin/portia
+	etc/portia
+	lib/portia
+	lib/perl5/Portia/*.pm
+"
+
+# --- copy files we want to release into a tmpdir ---
+cd $ROOTDIR
+mkdir -p $TMPDIR/$PV
+tar c $FILES | tar x -C $TMPDIR/$PV
+
+# --- remove extra files that we *don't* want ---
+cd $TMPDIR/$PV
+rm -rf etc/portia/sources.d/*.ignore
+
+# --- create the tarball ---
+cd $TMPDIR
+mkdir -p $RELEASEDIR
+tar czf $TARBALL $PV
+
+# --- clean up ---
+rm -r $TMPDIR
+
+echo "Tarball created: $TARBALL"
