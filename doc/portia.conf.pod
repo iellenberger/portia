@@ -1,0 +1,160 @@
+
+=head1 NAME
+
+portia.conf - portia configuration
+
+=head1 SYNOPSIS
+
+  /etc/portia/ and ~/.portia/
+    -> portia.conf and portia.conf.d/
+    -> sources.conf and sources.conf.d/
+    -> portia.preload
+
+=head1 DESCRIPTION
+
+Portia uses a combination of Bash eval'able and YAML files for configuration.
+
+B<portia.conf> and any files in B<portia.conf.d> are sourced are shell scripts.
+Any variables created or modified in these scripts are automatically exported.
+
+=head2 Order of Evaluation
+
+=over 4
+
+=item 1. B<Core Variables>
+
+=item 2. B<portia.preload>
+
+=item 3. B<portia.conf> and B<portia.conf.d>
+
+=back
+
+
+=head1 VARIABLES
+
+=head2 Pre-Execution Variables
+
+Pre-execution variables are set by portia before any script is executed.
+They can only be modified using the B<--set KEY=VALUE> option on the command line
+or by exporting the environment variable before portia is executed.
+
+=over 4 
+
+=item B<PORTIA_ROOT>
+
+The root directory used to calculate the default location of Portia components.
+The default value is one directory up from the absolute path of the Portia binary.
+(absolute path = path with all symlinks resolved)
+
+Perl Source:
+    use Cwd qw( abs_path );
+    use FindBin qw( $RealBin );
+    $ENV{PORTIA_ROOT} ||= abs_path("$RealBin/..");
+
+=back
+
+=head2 System Variables
+
+=over 4
+
+=item B<OS_TYPE> - operating system type
+
+Perl Source:
+    use Config;
+    $ENV{OS_NAME} = $Config{osname};
+
+=item B<OS_DIST> - operating system distribution
+
+=item B<OS_VERSION> - operating system version
+
+=item B<HW_ARCH> - hardware architecture
+
+Portia uses a number of methods in attempt to divine these values
+depending on which operating system is installed.
+
+For unsupported operating systems these values are unpredictable, so it is
+advisable to run C<portia --dumpconfig> on your system to view these values
+and determine whether you will need to override them.
+
+
+=back
+
+=head2 User Variables
+
+All user variables are set before any configuration files are sourced.
+The following is a list of defaults for each variable:
+
+    ETC_PATH       $PORTIA_ROOT/etc/portia:$HOME/.portia
+    PACKAGE_PATH   $PORTIA_ROOT/var/lib/portia/packages:$HOME/.portia/packages
+    TMP_DIR        $PORTIA_ROOT/var/tmp
+    WORK_DIR       $PORTIA_ROOT/var/tmp/portia
+    DISTFILES_DIR  $PORTIA_ROOT/var/lib/portia/distfiles
+    INSTALL_ROOT   $PORTIA_ROOT
+
+=over 4
+
+=item B<ETC_PATH> - configuration file path
+
+This is a colon-separated list of directories Portia uses to find its configuration files.
+
+To override this value, you must create a file named C<portia.preload> in the
+default path and set a new value in that file.
+Portia will search the default path in reverse order to find preload files.
+If a preload file is found, it will source that file, stop looking for
+additional preload files and continue normal processing.
+
+=item B<PACKAGE_PATH> - package repository path
+
+A colon-separated list of directories Portia searches for package repositories.
+
+=item B<DISTFILES_DIR> - location for depositing compiled binaries
+
+The default location Portia deposits binaries.
+Note that this is not the path Portia uses to search for binaries to install.
+
+=item B<TMP_DIR> - temporary directory
+
+=item B<WORK_DIR> - working directory
+
+By default, WORK_DIR is under TMP_DIR.
+These are the directories portia uses for compiling and pre-installing binaries.
+Be sure these locations have enough disk space to accomodate the tasks or
+redefine them to a location that does.
+
+=item B<INSTALL_ROOT> - root directory where packages will be installed
+
+=back
+
+=head1 TODO, KNOWN ISSUES AND BUGS
+
+=over 4
+
+=item B<TODO: Bash Function To Write>
+
+B<osMatch> - string matching routine for OS
+
+B<perlConfig($VAR, 'KEY')> - sets $VAR to Perl's $Config{'KEY'}
+
+=back
+
+
+=head1 AUTHOR
+
+Written by Ingmar Ellenberger.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001-2012, Ingmar Ellenberger and distributed under The Artistic License.
+For the text the license, see L<https://github.com/iellenberger/itools/blob/master/LICENSE>
+or read the F<LICENSE> in the root of the iTools distribution.
+
+=head1 SEE ALSO
+
+portia(1),
+Portia::Config(3pm),
+FindBin(3pm),
+Config(3pm),
+
+=cut
+
+
