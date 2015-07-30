@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# --- Portia-in-dev-space setup script ---
+# If you are doing Portia deveopment (i.e. modifying Portia itself),
+# this script will setup your environment for that purpose.
+#
+# What does it do?
+#
+#	* Gets the latest copy of all dependencies, places them in var/deps/
+#	* Creates appropriate symlinks to the deps to make sure everything works properly
+#	* Prepends the bin/ dir to your path (useful if you're sourcing the script)
+#
+# Use this script in three ways:
+#
+#	* Run it.  That will do the 1st 2 steps
+#	* Source it.  That will add the path for your current shell.
+#	* Add it to your .bashrc.  That will generate super-automatic, happy, happy, joy, joy, awesomeness for your life in general.
+
+# --- get the root dir of the Git repo ---
+REPO_ROOT=$(cd $(dirname $0)/..; pwd)
+DEPS_RELATIVE=var/deps
+DEPS_ROOT=$REPO_ROOT/$DEPS_RELATIVE
+
+# --- create var/deps ---
+mkdir -p $DEPS_ROOT
+cd $DEPS_ROOT
+
+# --- get or update itools ---
+if [ -e itools ]; then
+	cd itools
+	git pull --quiet
+else
+	git clone --quiet https://github.com/iellenberger/itools.git
+fi
+
+# --- create symlinks as appropriate ---
+cd $REPO_ROOT
+ITOOLS_LINKS="
+	bin/manifest
+	lib/perl5/HashRef
+	lib/perl5/iTools
+"
+for FILE in $ITOOLS_LINKS; do
+	if [ ! -e $FILE ]; then
+		SYMLINK=$(perl -e 'use File::Spec; print File::Spec->abs2rel(@ARGV) . "\n"' $DEPS_ROOT/itools/$FILE $(dirname $FILE))
+		ln -s $SYMLINK $FILE
+	fi
+done
+
+# --- prepend binto path if it's not already there ---
+if ! echo $PATH | egrep -q "(^|:)$$REPO_ROOT/bin($|:)" ; then
+	export PATH=$REPO_ROOT/bin:$PATH
+fi

@@ -1,5 +1,4 @@
 # --- iTools symlinks ---
-# Development is so much easier if we symlink these from iTools
 bin/manifest
 lib/perl5/HashRef
 lib/perl5/iTools
@@ -7,6 +6,6 @@ lib/perl5/iTools
 # --- place to hide away older files ---
 .archive
 
-# --- dirs generated during testing ---
+# --- dirs generated during build and test ---
 /tmp
 /var
