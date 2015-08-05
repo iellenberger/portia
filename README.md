@@ -22,15 +22,20 @@ It is specifically designed to accommodate the needs of system administrators an
 
 **Portia** ...
 
-* **will run on almost any \*nix-based system**.
-* **has nominal dependencies**.  As long as you have Bash and the [standard Perl distribution](http://perldoc.perl.org/perlmodlib.html#Standard-Modules), you should be good to go.  Portia's own distribution is fully self contained ... and most importantly: no [CPAN](http://www.cpan.org/), a *must* for private networks.
-* **doesn't require you to know Perl.**   Many of you \*HATE* Perl (for misguided reasons, mostly), but don't worry - if you're an end user, package builder or system administrator, you'll never see or need to know a single line of Perl.  You may want to bone up on your Bash though.
+* ... **will run on almost any \*nix-based system**.
+* ... **has nominal dependencies**.
+As long as you have Bash and the [standard Perl distribution](http://perldoc.perl.org/perlmodlib.html#Standard-Modules), you should be good to go.
+Portia's own distribution is fully self contained ... and most importantly: no [CPAN](http://www.cpan.org/), a *must* for private networks.
+* ... **doesn't require you to know Perl.**
+Many of you \*HATE* Perl (for misguided reasons, mostly) but don't worry - if you're an end user, package builder or system administrator, you'll never see a single line of Perl.
+You may want to bone up on your Bash though.
 
 Where We Are Today
 ------------------
 
 Portia has been deployed in a number of corporate environments to date (names withheld) and is stable.
-The biggest thing missing is decent documentation.  Over the next few months, I plan to finally getting around to getting the docs in place so others can more easily enjoy the goodness.
+The biggest thing missing is decent documentation.
+Over the next few months, I plan to finally get the docs in place so others can more easily enjoy the goodness.
 
 Links
 -----

@@ -109,13 +109,11 @@ portia_build() {
 	vecho 0 "Building $CATEGORY/$PVR"
 
 	# --- fetch the source ---
-	mkdir -p "$DOWNLOAD_DIR"; cd "$DOWNLOAD_DIR"
-	rmr_safe "$DOWNLOAD_DIR" DOWNLOAD_DIR
+	cd_empty "$DOWNLOAD_DIR" DOWNLOAD_DIR
 	vrun 0 "   fetching source" src_fetch
 
 	# --- unpack the sources --- 
-	mkdir -p "$WORK_DIR"; cd "$WORK_DIR"
-	rmr_safe "$WORK_DIR" WORK_DIR
+	cd_empty "$WORK_DIR" WORK_DIR
 	vrun 0 "   unpacking source" src_unpack
 
 	# --- prepare the sources --- 
@@ -127,8 +125,7 @@ portia_build() {
 	cd "$WORK_DIR"; vrun 0 "   testing" src_test
 
 	# --- install to staging area ---
-	mkdir -p "$STAGE_DIR"; cd "$STAGE_DIR"
-	rmr_safe "$STAGE_DIR" PREINSTALL_DIR
+	cd_empty "$STAGE_DIR" STAGE_DIR
 	cd "$WORK_DIR";
 	vrun 0 "   installing to staging area" src_install
 

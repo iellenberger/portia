@@ -167,8 +167,7 @@ portia_install() {
 	vecho 0 "Installing $C/$PVR"
 
    # --- make sure we have a clean work root ---
-	mkdir -p "$PWORK_DIR"; cd "$PWORK_DIR"
-	rmr_safe "$PWORK_DIR" PWORK_DIR
+	cd_empty "$PWORK_DIR" PWORK_DIR
 
 	# --- fetch the binaries ---
 	mkdir -p "$DOWNLOAD_DIR"; cd "$DOWNLOAD_DIR"
