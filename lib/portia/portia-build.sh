@@ -125,7 +125,7 @@ portia_build() {
 	cd "$WORK_DIR"; vrun 0 "   testing" src_test
 
 	# --- install to staging area ---
-	cd_empty "$STAGE_DIR" PREINSTALL_DIR
+	cd_empty "$STAGE_DIR" STAGE_DIR
 	cd "$WORK_DIR";
 	vrun 0 "   installing to staging area" src_install
 
