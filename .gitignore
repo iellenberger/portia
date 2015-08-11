@@ -1,4 +1,5 @@
 # --- iTools symlinks ---
+bin/acquire
 bin/manifest
 lib/perl5/HashRef
 lib/perl5/iTools

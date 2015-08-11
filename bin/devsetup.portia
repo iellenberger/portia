@@ -36,6 +36,7 @@ fi
 # --- create symlinks as appropriate ---
 cd $REPO_ROOT
 ITOOLS_LINKS="
+	bin/acquire
 	bin/manifest
 	lib/perl5/HashRef
 	lib/perl5/iTools
