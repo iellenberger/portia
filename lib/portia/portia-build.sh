@@ -57,10 +57,10 @@ src_unpack() {
 	local _FILE
 
 	# --- unpack each source tarball ---
-	for _FILE in `ls $DOWNLOAD_DIR`; do
+	for _FILE in `find $DOWNLOAD_DIR -type f -maxdepth 1`; do
 		#! TODO: implement unpack
 		#unpack $_FILE
-		tar xzf $DOWNLOAD_DIR/$_FILE
+		tar xzf $_FILE
 	done
 }
 
