@@ -58,11 +58,11 @@ bin_unpack() {
 
 	# --- unpack each binary tarball ---
 	vecho 2 "         in" $( pwd )
-	for _FILE in `ls $DOWNLOAD_DIR`; do
+	for _FILE in `find $DOWNLOAD_DIR -type f -maxdepth 1`; do
 		#! TODO: implement unpack
 		#unpack $_FILE
 		vecho 1 "      unpacking $_FILE"
-		tar xzf $DOWNLOAD_DIR/$_FILE
+		tar xzf $_FILE
 	done
 }
 
@@ -184,7 +184,7 @@ portia_install() {
 	cd "$STAGE_DIR"; vrun 0 "   running pre-installation script" bin_preinstall
 	cd "$PWORK_DIR"; vrun 0 "   generating manifests" bin_manifest
 	cd "$PWORK_DIR"; vrun 0 "   running installation script" bin_install
-	cd "$STAGE_DIR"; vrun 0 "   running post-installaion script" bin_postinstall
+	cd "$PWORK_DIR"; vrun 0 "   running post-installaion script" bin_postinstall
 
 	vecho 0 "$PVR installed"
 }
