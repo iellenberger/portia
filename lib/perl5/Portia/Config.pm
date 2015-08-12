@@ -88,7 +88,7 @@ sub maps {
 			DBD          DB_DIR          DB_ROOT/CATEGORY/PACKAGE
 			DR         DISTFILES_ROOT    PORTIA_LIB/distfiles
 			DD           DISTFILES_DIR   DISTFILES_ROOT/CATEGORY/PACKAGE
-			EP       ETC_PATH            PORTIA_ROOT/etc/portia
+			EP       ETC_PATH            undef
 
 			TR       TMP_ROOT            PORTIA_ROOT/var/tmp
 			WR         WORK_ROOT         TMP_ROOT/portia
@@ -252,7 +252,9 @@ sub _loadEnv {
 	$self->hardSet(PORTIA_BIN  => $ENV{PORTIA_BIN}  || abs_path("$Bin/$Script"));
 
 	# --- generate a list of initial config dirs ---
+	# Note: last one wins
 	my @etcpath = uniq(
+		"/etc/portia",
 		"$self->{PORTIA_ROOT}/etc/portia",
 		abs_path("$Bin/..") ."/etc/portia",
 		abs_path("$RealBin/..") ."/etc/portia",
