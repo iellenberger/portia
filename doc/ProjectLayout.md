@@ -35,7 +35,13 @@ For the all examples, let's presume that Portia is installed in `/opt/portia/` a
 
 ## For Installers and SysAdmins
 
-In Portia, there are a few ways you can define the installation root directory.  Choose your poison.
+In Portia, there are a three ways you can define the installation root directory:
+
+1. **Do nothing** to have packages installed in `/usr/local/`.
+2. **Set the INSTALL_ROOT** to define an alternate installation location.
+3. **Create some symlink magic** and have Portia change its INSTALL_ROOT based on where you run it.
+
+Details below.  Choose your poison.
 
 ### 1. Do Nothing
 
@@ -110,23 +116,95 @@ This means you can control INSTALL_ROOT in `/opt/myapp/etc/portia/portia.conf`.
 
 ### Additional Note on PATHs for SysAdmins
 
-If you are running Portia in a multi-environment context, you can change your current shell environment by simply rewiting the PATH variable.
+If you are running Portia in a multi-environment context, you can change which copy (symlink, actually) of Portia will run in a given shell by simply rewiting the PATH variable.
 
 ## For Package Builders
 
-the build phase
+As a package builder, there are three key things you need to pay attention to:
 
-* WORK_DIR - stuff gets unpacked here, this is your work area
-* STAGE_DIR - make this a snapshot of 
+1. Do your work in the WORK\_DIR
+2. Keep your STAGE\_DIR pristine
+3. Avoid absolute paths
 
-The install phase
+There are edge cases where these guidelines cannot be followed, but be very careful when doing otherwise.
+It may make your package unusable for system administrators and installers.
 
-* WORK_DIR - stuff gets unpacked here, this is your work area
-* STAGE_DIR - set this up to be an exact copy of 
+### Do Your Work in the WORK\_DIR
 
-### Don't Use Hard-Coded Paths
+During both the build and install phases, Portia unpacks downloaded source archives into the WORK\_DIR.
+This is the place you should do all of your work.
+
+### Keep Your STAGE\_DIR Pristine
+
+The STAGE\_DIR is intended to be a snapshot of your deliverable.
+
+In the build phase, Portia's default action is to create a tarball snapshot of STAGE\_DIR for upload to the binary repository.
+You should only place files needed during the install phase in STAGE\_DIR.
+
+In the install phase, Portia's default action is to copy STAGE\_DIR verbatum to INSTALL\_DIR.
+You should structure STAGE\_DIR to be the same layout as the INSTALL\_DIR target, and all files should be in their final form.
+
+### Avoid Absolute Paths
+
+When writing .pbuild files, use relative paths wherever possible and [Portia path variables](Variables.md) everwhere else.
+This will allow system administrators and installers to relocate your package to wherever the require.
+
+Remember that there is no guarantee that files outside of Portia controlled directories will conform to your expectations.
 
 ## For Application Developers
+
+As an application developer, it is triply important that you pay attention to standards like the [FHS](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard).
+Well structured repositories and source structures makes it much easier for package builders, installers and system administrators alike.
+
+Key things to follow:
+
+* Structure your repositories so that non-developers can easily work with them.
+* Break up your build process into the standard makefile-style sequence of operations: configure, clean, all (a.k.a. build), test, install.
+* Make sure that your install operation is able to deliver build products to an arbitrary location.
+* Make sure your build products can operate in an arbitrary install location.
+
+That last one is so important, I'm giving it's own title ...
+
+### Make Your Binaries are Relocatable
+
+How do you do that?
+Simple - don't hard code paths into your binaries.
+I't kinda dickish to require that installers recompile your whole package if they want to move it to another location on the filesystem.
+
+#### So how do I do that?
+
+> Remember when I told you to pay attention back in the **For Installers and SysAdmins - Create Some SymLink Magic** section?
+> You weren't paying attention, were you.
+> If you haven't read that bit or don't remember it, go back and read it now.
+> The paragraphs below show you how to implement it for your programs.
+
+Your programs should always be able know where their *virtual root* is and should look under that directory for all its configuration files.
+For example, if I install your application in `/opt/myenv/bin/your_program`, it should be intelligent enough to find its configuration files in `/opt/myenv/etc/your_program` and not immediately look in `/etc/your_program`.  Every language has some facility to accomodate this - you just have to use it.
+
+Here are some examples of code to find the paths of the root directory:
+
+##### Bash
+
+```
+# --- without resolving symlinks ---
+APP_ROOT=$(cd $(dirname $0/..; pwd)
+# --- resolving symlinks ---
+NOSYM_ROOT=$(cd $(dirname $0/..); pwd -P)
+```
+
+##### Perl 5
+
+```
+use Cwd qw( abs_path );
+use FindBin qw( $Bin $RealBin );
+
+# --- without resolving symlinks ---
+my $APP_ROOT = "$Bin/..";
+# --- resolving symlinks ---
+my $NOSYM_ROOT = abs_path("$RealBin/..");
+```
+
+I'll provide more examples in other languages when I bother to look them up.
 
 ## Reference
 
