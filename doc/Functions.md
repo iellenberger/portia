@@ -120,7 +120,7 @@ Feel free to browse the libraries to fully understand how each function operates
 
 ##### `bin_unpack` - unpack source archive(s)
 
-> **Default Action**: Unpack tarballs in DOWNLOAD\_DIR to WORK\_DIR <br>
+> **Default Action**: Unpack tarballs in DOWNLOAD\_DIR to STAGE\_DIR <br>
 > **Initial Working Directory**: STAGE\_DIR
 >
 > This function works identically to `src_unpack`.
