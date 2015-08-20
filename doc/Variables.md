@@ -49,6 +49,9 @@ PW         PWORK_DIR       WORK_ROOT/CATEGORY/PACKAGE
 DL           DOWNLOAD_DIR  PWORK_DIR/download
 WD           WORK_DIR      PWORK_DIR/work
 SD           STAGE_DIR     PWORK_DIR/stage
+
+       PBUILD_DIR          Directory of .pbuild file
+       PBUILD_FILE         .pbuild file name
 ```
 
 Any change you make to these variables outside of a pbuild function will be inherited by the dependent variables unless you have already explicitly defined the dependant variable to be another value.
@@ -144,6 +147,10 @@ If you define `TMP_ROOT=/mytmp`, `WORK_ROOT` will have the value `/mytmp/portia`
 > **Default:** `PWORK_DIR/stage`
 > 
 > The 'fake' install root used when packages are created or staged for installation.
+
+##### `PBUILD_DIR`; `PBUILD_FILE`
+> If you specified a .pbuild file on the command line,
+> these are the location and filename of the file.
 
 ## Hardware and Operating System
 

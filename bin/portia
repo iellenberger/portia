@@ -5,6 +5,7 @@ our $VERSION="0.1.0";
 use FindBin qw( $Bin $RealBin );
 use lib ("$RealBin/../lib/perl5", "$Bin/../lib/perl5");
 
+use Cwd qw( abs_path );
 use Data::Dumper; $Data::Dumper::Indent=$Data::Dumper::Sortkeys=$Data::Dumper::Terse=1; # for debugging only
 use HashRef::NoCase qw( nchash );
 use iTools::Script::Options;
@@ -406,6 +407,11 @@ sub _getVersions {
 
 	# --- show config for a unpushed pbuild ---
 	if ($options->{file}) {
+		# --- set a pbuild variables in config ---
+		$config->hardSet(
+			PBUILD_DIR => abs_path("$options->{file}/.."),
+			PBUILD_FILE => $options->{file}
+		);
 		# --- load the pbuild ---
 		return load Portia::Version(
 			File => $options->{file},

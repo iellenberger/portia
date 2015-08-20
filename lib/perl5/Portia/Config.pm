@@ -101,6 +101,9 @@ sub maps {
 			PU     PACKAGE_URI           REPO_URI/packages/CATEGORY/PACKAGE
 			DU     DISTFILES_URI         REPO_URI/distfiles/CATEGORY/PACKAGE
 
+			undef  PBUILD_DIR            undef
+			undef  PBUILD_FILE           undef
+
 			P      PACKAGE               undef
 			V      VERSION               undef
 			R      REVISION              undef

@@ -1,7 +1,5 @@
 bin/portia
-etc/portia/portia.conf
-etc/portia/sources.d/sandbox.yaml
-etc/portia/sources.yaml
+etc/portia/sources.d/local.yaml
 lib/perl5/Portia/Config.pm
 lib/perl5/Portia/Package.pm
 lib/perl5/Portia/Repository.pm
