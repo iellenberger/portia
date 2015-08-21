@@ -173,7 +173,7 @@ sub syncFull {
 				rm -rf ../packages/* ../packages/.list ../packages/.tgz
 				# --- get and unpack the tarball ---
 				wget ". (verbosity >= 4 ? ' ' : '--quiet ') . $uri->uri ."/.tgz
-				tar x". (verbosity >= 4 ? 'v' : '') ."zf .tgz
+				$ENV{TAR} x". (verbosity >= 4 ? 'v' : '') ."zf .tgz
 				# --- remove the tarball ---
 				rm -f .tgz
 			";
@@ -206,7 +206,7 @@ sub syncPackage {
 
 	# --- unpack the tarball ---
 	pushdir $root;
-	system "tar x". (verbosity >= 4 ? 'v' : '') ."zf .tgz; rm .tgz";
+	system "$ENV{TAR} x". (verbosity >= 4 ? 'v' : '') ."zf .tgz; rm .tgz";
 	popdir;
 }
 

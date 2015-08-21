@@ -9,7 +9,7 @@ use FindBin qw( $Bin $RealBin $Script );
 use iTools::File qw( readfile );
 use iTools::Verbosity qw( vprint );
 use Portia::Sources;
-use Portia::Tools qw( source uniq );
+use Portia::Tools qw( source uniq trim );
 use Storable qw( dclone );
 
 use strict;
@@ -76,6 +76,7 @@ sub maps {
 			undef  OS_DIST               undef
 			undef  OS_VERSION            undef
 			undef  HW_ARCH               undef
+			undef  TAR                   undef
 
 			BR     BIN_ROOT              undef
 			undef    PORTIA_BIN          BIN_ROOT/bin/portia
@@ -193,6 +194,9 @@ sub reload {
 	$self->_loadOS;
 	$self->_loadHardware;
 	$self->_loadEnv;
+
+	# --- misc. additional settings ---
+	$self->softSet(TAR => trim(qx[ which gnutar || which tar ]) || 'tar');
 
 	return $self;
 }

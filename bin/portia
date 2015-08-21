@@ -239,6 +239,7 @@ sub pushBuild {
 	my $CP = $config->{CP};
 	my $PV = $config->{PV};
 	my $VR = $config->{VR};
+	my $TAR = $config->{TAR};
 	my $pkgpath = $repopath ."/packages/". $CP;
 
 	# --- copy pbuild ---
@@ -259,14 +260,14 @@ sub pushBuild {
 	pushdir $pkgpath;
 	vprint 0, "Generating package manifest and tarball\n";
 	system "$RealBin/manifest -grfq -O .mf *";
-	system "tar c". (verbosity >= 4 ? 'v' : '') ."zf .tgz * .mf";
+	system "$TAR c". (verbosity >= 4 ? 'v' : '') ."zf .tgz * .mf";
 
 	# --- generate repository list and tarball ---
 	if (-W "$repopath/packages") {
 		vprint 0, "Generating repository package list and tarball\n";
 		chdir "$repopath/packages";
 		system "find * -mindepth 1 -maxdepth 1 -type d > .list";
-		system "tar c". (verbosity >= 4 ? 'v' : '') ."zf .tgz --exclude .tgz .list *";
+		system "$TAR c". (verbosity >= 4 ? 'v' : '') ."zf .tgz --exclude .tgz .list *";
 	}
 }
 
