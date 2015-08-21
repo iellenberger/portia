@@ -5,6 +5,7 @@ use base Exporter;
 	source
 	uniq interpolate match
 	indent undent
+	trim
 );
 
 #use Data::Dumper; $Data::Dumper::Indent=$Data::Dumper::Sortkeys=$Data::Dumper::Terse=1; # for debugging only
@@ -162,12 +163,20 @@ sub undent {
 	# --- unindent the block of text ---
 	$text =~ s/^$indent//mg;
 
-	# --- trim leading and trailing space ---
+	# --- trim leading and trailing space (multiline) ---
 	$text =~ s/^\s*\n//s;
 	$text =~ s/[\t ]*$//msg;
 	return '' unless $text;
 
 	return $text;
+}
+
+# --- trim leading and trailing space (string context) ---
+sub trim {
+	my $string = shift;
+	$string =~ s/^\s+//;
+	$string =~ s/\s+$//;
+	return $string;
 }
 
 1;
@@ -178,7 +187,7 @@ Portia::Tools - Perl-based tools to support Portia
 
 =head1 SYNPOSIS
 
-use Portia::Tools qw( source uniq interpolate match indent undent );
+use Portia::Tools qw( source uniq interpolate match indent undent trim );
 
 =head1 DESCRIPTION
 
@@ -234,6 +243,10 @@ Returns the indented block of text.
 Removes the indent from a block of TEXT by finding the smallest indent
 and removing that number of spaces from the beginning of each line.
 Tabs are translated to be 4 spaces.
+
+=item B<trim>(STRING)
+
+Trims leading and trailing whitespace from STRING.
 
 =back
 
