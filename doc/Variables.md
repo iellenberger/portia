@@ -182,6 +182,12 @@ If you define `TMP_ROOT=/mytmp`, `WORK_ROOT` will have the value `/mytmp/portia`
 > 
 > Supported values: `i386`, `i686`, `amd64`, `x86_64`
 
+##### `TAR`
+> **default:** Computed
+> 
+> The full path to the `tar` binary.
+> Searches the path for either `gnutar` ('cause OS-X's version of tar is gimped) or `tar`.
+
 ## Package, Version Revision and Category
 
 These define the values used to uniquely identify a package.
