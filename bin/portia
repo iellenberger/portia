@@ -12,6 +12,7 @@ use iTools::Script::Options;
 use iTools::System qw( chdir mkdir unlink pushdir popdir system command );
 use iTools::Verbosity qw( vprint vprintf verbosity );
 use Portia::Config;
+use Portia::Misc qw( pushPack pushUpload processUpload reindex );
 use Portia::Package;
 use Portia::Sources;
 use Portia::Tools qw( indent );
@@ -98,6 +99,10 @@ given ($command) {
 	when ('flush')   { flushCaches() }
 	when ('build')   { build(@ARGV) }
 	when ('install') { install(@ARGV) }
+
+	when ('reindex')       { cmdReindex(@ARGV) }
+	when ('processupload') { cmdProcessUpload(@ARGV) }
+
 	default          { $options->usage("unknown command '$command'") }
 }
 
@@ -193,82 +198,36 @@ sub pushBuild {
 	unless (-e $pbuild) { vprint -2, "The pbuild file '$pbuild' does not exist\n"; exit 1; }
 	unless (-R $pbuild) { vprint -2, "The pbuild file '$pbuild' is not readable\n"; exit 1; }
 
-	# --- find the push repo ---
-	my $repo = findRepo Portia::Sources(
-		tags  => 'push',
-		sync  => 'live',
-		name  => $options->{repo},
-	);
-
-	# --- make sure we have a valid repo ---
-	unless ($repo) {
-		my $msg = $options->{repo} ? "source repository '$options->{repo}' is not" : "could not find";
-		vprint -2, "error: $msg a valid 'push' repository\n";
-		vprint -1, "\n'push' repositories must include these settings:\n\n".
-		           "   sync : live\n".
-		           "   tags : push\n".
-		           "   uri  : file:///some/path\n\n";
-		if (exists $sources->{$options->{repo}}) {
-			vprint 1, "The requested repository is configured as follows:\n\n".
-			          indent(3, $sources->{$options->{repo}}->dumpConfig()) ."\n";
-		}
-		vprint -1, "See the portia(1) manual page for details\n\n";
-		exit 1;
-	}
-	$config->selectRepo($repo);
-
-	# --- make sure the repo has a valid URI ---
-	my $uri = new iTools::URI(URI => $repo->{uri});
-	my ($scheme, $repopath) = ($uri->scheme || '', $uri->path || '');
-	unless ($scheme eq 'file') {
-		my $msg = $scheme ? "invalid sync scheme '$scheme'" : "unknown sync scheme";
-		vprint -2, "error: $msg for source repository '". $repo->name ."'\n";
-		vprint -1, "   repository URI must have a scheme of 'file'\n".
-		           "   URI found: ". $uri->uri ."\n";
-		exit 1;
-	}
-
 	# --- load the pbuild ---
 	my $version = load Portia::Version(
-		Repo => $repo->name,
+		#Repo => $repo->name,
 		File => $pbuild,
 	);
 	$config->selectVersion($version);
 
-	# --- scrape a few vars ---
-	my $CP = $config->{CP};
-	my $PV = $config->{PV};
-	my $VR = $config->{VR};
-	my $TAR = $config->{TAR};
-	my $pkgpath = $repopath ."/packages/". $CP;
+	# --- create the tarball ---
+	my $tarfile = pushPack($config, $pbuild, @files);
 
-	# --- copy pbuild ---
-	vprint 0, "Pushing $CP-$VR to repository '". $repo->name ."'\n";
-	mkdir $pkgpath;
-	system "cp $pbuild $pkgpath/$PV.pbuild";
+	# --- upload the tarball ---
+	my $uri = pushUpload($config, $options->{repo}, $tarfile);
 
-	# --- copy any additional files ---
-	if (@files) {
-		vprint 1, ">copying additional files\n";
-		mkdir "$pkgpath/files/$PV";
-		foreach my $file (@files) {
-			system "cp -a $file $pkgpath/files/$PV";
-		}
+	# --- unpack and index if scheme is file ---
+	#! TODO: is this really what we want, or should there be a separate process for this?
+	if ($uri->scheme eq 'file') {
+		my @packages = processUpload($config, $uri->path ."/upload/". ($tarfile =~ /([^\/]*)$/)[0]);
+		reindex($config, @packages);
 	}
+}
 
-	# --- generate package manifests and tarball ---
-	pushdir $pkgpath;
-	vprint 0, "Generating package manifest and tarball\n";
-	system "$RealBin/manifest -grfq -O .mf *";
-	system "$TAR c". (verbosity >= 4 ? 'v' : '') ."zf .tgz * .mf";
+# --- command: reindex ---
+sub cmdReindex {
+	reindex($config, @_);
+}
 
-	# --- generate repository list and tarball ---
-	if (-W "$repopath/packages") {
-		vprint 0, "Generating repository package list and tarball\n";
-		chdir "$repopath/packages";
-		system "find * -mindepth 1 -maxdepth 1 -type d > .list";
-		system "$TAR c". (verbosity >= 4 ? 'v' : '') ."zf .tgz --exclude .tgz .list *";
-	}
+# --- command: processupload ---
+sub cmdProcessUpload {
+	my @packages = processUpload($config, @_);
+	reindex($config, @packages);
 }
 
 # --- command: build ---
