@@ -114,7 +114,7 @@ cd_empty() {
 	fi
 
 	# --- if we got here, we should be safe ---
-	vecho 2 "      emptying contents of deleting $_PWD/"
+	vecho 2 "      emptying $_PWD/"
 	rm -rf .[^.]* ..?* *
 }
 

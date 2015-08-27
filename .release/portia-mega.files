@@ -1,6 +1,7 @@
 bin/portia
 etc/portia/sources.d/local.yaml
 lib/perl5/Portia/Config.pm
+lib/perl5/Portia/Misc.pm
 lib/perl5/Portia/Package.pm
 lib/perl5/Portia/Repository.pm
 lib/perl5/Portia/Sources.pm
