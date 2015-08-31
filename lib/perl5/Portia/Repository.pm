@@ -285,7 +285,9 @@ sub packageList {
 		my $root = $self->root ."/packages";
 
 		# --- load the repo's .list file for sparse and deep ---
-		if ($self->{sync} =~ /^(?:sparse|deep)$/) {
+		if (
+			$self->{sync} =~ /^(?:sparse|deep)$/ && -e "$root/.list"
+		) {
 			map { $self->{'.list'}->{$_} = 0 }
 				grep { $_ } split /\s/, readfile("$root/.list");
 		}
