@@ -3,11 +3,12 @@ use base qw( iTools::Core::Accessor HashRef::Maskable );
 
 use Data::Dumper; $Data::Dumper::Indent=1; $Data::Dumper::Sortkeys=1; # for debugging only
 
-use iTools::File qw( readfile );
+use iTools::File qw( readfile writefile );
 use iTools::System qw( nofatal mkdir pushdir popdir system );
 use iTools::Term::ANSI qw( color );
 use iTools::URI;
 use iTools::Verbosity qw( verbosity vprint vtmp );
+use LWP::Simple;
 use Portia::Package;
 use Portia::Sources;
 use Portia::Tools qw( indent match );
@@ -146,6 +147,7 @@ sub sync {
 }
 
 # --- do a full sync ---
+#! TODO: need to trace code - not sure this ever gets executed.
 sub syncFull {
 	my $self = shift;
 
@@ -166,15 +168,20 @@ sub syncFull {
 		when ('file')  { $cmd .= $uri->path ."/* ."; }
 
 		# --- otherwise wget a tarball ---
-		#! TODO: use LWP for http[s]
 		default {
-			$cmd = "
-				# --- remove everything first ---
-				rm -rf ../packages/* ../packages/.list ../packages/.tgz
-				# --- get and unpack the tarball ---
-				wget ". (verbosity >= 4 ? ' ' : '--quiet ') . $uri->uri ."/.tgz
+			$cmd = '';  # clear this so system won't run later
+
+			# --- get the tarball ---
+			my $content = get $uri->uri ."/.tgz";
+			break unless $content;
+
+			# --- remove everything ---
+			system "rm -rf ../packages/* ../packages/.list ../packages/.tgz";
+
+			# --- write and unpack the tarball ---
+			writefile ".tgz", $content;
+			system "
 				$ENV{TAR} x". (verbosity >= 4 ? 'v' : '') ."zf .tgz
-				# --- remove the tarball ---
 				rm -f .tgz
 			";
 		}
@@ -182,17 +189,23 @@ sub syncFull {
 
 	# --- execute the command, ensure no fatal errors ---
 	#! TODO: use a capture for this for cleaner warnings and output
-	nofatal { system $cmd; };
+	nofatal { system $cmd; }
+		if $cmd;
 
 	popdir;
+
+	#! TODO: return status on failure
 }
 
 # --- sync only the .list file ---
 sub syncList {
 	my $self = shift;
 	$self->_syncFile('.list');
+
 	# --- load the package list ---
-	$self->{'.list'} = [ grep { $_ } split /\s/, readfile($self->root ."/packages/.list") ];
+	my $listfile = $self->root ."/packages/.list";
+	return unless -r $listfile;
+	$self->{'.list'} = [ grep { $_ } split /\s/, readfile($listfile) ];
 }
 
 # --- sync a package via its tarball ---
@@ -260,18 +273,24 @@ sub _syncFile {
 		when ('file')  { $cmd .= $uri->path ."$file ."; }
 
 		# --- otherwise wget a tarball ---
-		#! TODO: use LWP for http[s]
 		default {
-			$cmd = "rm -f $file; wget ". (verbosity >= 4 ? ' ' : '--quiet ') . $uri->uri ."$file";
+			$cmd = '';  # clear this so system won't run later
+			my $content = get $uri->uri . $file;
+			if ($content) {
+				system "rm -f $file";
+				writefile $file, $content;
+			}
 		}
 	}
 
 	# --- execute the command, ensure no fatal errors ---
 	#! TODO: use a capture for this for cleaner warnings and output
 	#nofatal { system $cmd; };
-	system $cmd;
+	system $cmd if $cmd;
 
 	popdir;
+
+	#! TODO: return SOME status if the sync failed
 }
 
 # === Package Management ====================================================
@@ -285,7 +304,9 @@ sub packageList {
 		my $root = $self->root ."/packages";
 
 		# --- load the repo's .list file for sparse and deep ---
-		if ($self->{sync} =~ /^(?:sparse|deep)$/) {
+		if (
+			$self->{sync} =~ /^(?:sparse|deep)$/ && -e "$root/.list"
+		) {
 			map { $self->{'.list'}->{$_} = 0 }
 				grep { $_ } split /\s/, readfile("$root/.list");
 		}
