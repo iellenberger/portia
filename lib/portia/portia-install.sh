@@ -58,7 +58,7 @@ bin_unpack() {
 
 	# --- unpack each binary tarball ---
 	vecho 2 "         in" $( pwd )
-	for _FILE in `find $DOWNLOAD_DIR -type f -maxdepth 1`; do
+	for _FILE in `find $DOWNLOAD_DIR -maxdepth 1 -type f`; do
 		#! TODO: implement unpack
 		#unpack $_FILE
 		vecho 1 "      unpacking $_FILE"
