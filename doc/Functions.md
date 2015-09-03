@@ -108,6 +108,18 @@ Feel free to browse the libraries to fully understand how each function operates
 > 
 > The resulting tarball combined with the .pbuild file are the binary distribution of the package.
 
+##### `src_post` - user-defined post-build hook
+> **Default Action**: None<br>
+> **Initial Working Directory**: STAGE\_DIR
+>
+> Here if you need it.  A good time to grab a copy of the built tarball if you have a need for it.
+
+##### `src_cleanup` - temporary directory cleanup
+> **Default Action**: Delete temporary directories<br>
+> **Initial Working Directory**: WORK\_ROOT
+>
+> Deletes WORK\_ROOT.
+
 ## Install Functions
 
 ##### `bin_fetch` - download binary archive(s)

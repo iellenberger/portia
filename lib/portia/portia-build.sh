@@ -52,15 +52,28 @@ src_fetch() {
 # --- unpack the source tarballs ---
 # This function is used to unpack all the sources in DOWNLOAD_DIR to WORK_DIR.
 # Initial working directory: WORK_DIR
+#! TODO: make this much more sophisticated, unpacking by extension and moving the rest
 src_unpack() {
 	# --- localize variables ---
 	local _FILE
 
 	# --- unpack each source tarball ---
-	for _FILE in `find $DOWNLOAD_DIR -type f -maxdepth 1`; do
+	for _FILE in `find $DOWNLOAD_DIR -maxdepth 1 -type f -name "*.tgz" -o -name "*.tar.gz"`; do
 		#! TODO: implement unpack
 		#unpack $_FILE
+		vecho 1 "      unpacking $_FILE"
 		tar xzf $_FILE
+		rm $_FILE
+	done
+
+	# --- move everything else to WORK_DIR ---
+	vecho 1 "      moving remaining files to $WORK_DIR"
+	for _FILE in `find $DOWNLOAD_DIR -maxdepth 1`; do
+
+		# --- don't move the download dir itself ---
+		if [[ $_FILE == $DOWNLOAD_DIR ]]; then continue; fi
+
+		mv $_FILE $WORK_DIR
 	done
 }
 
@@ -102,6 +115,22 @@ src_pack() {
 	tar czf $DISTFILES_DIR/$PVR.tgz .
 }
 
+# --- user defined post-build steps ---
+# Initial working directory: STAGE_DIR
+#src_post() { return 0; }
+
+# --- post-build cleanup ---
+# Initial working directory: WORK_ROOT
+src_cleanup() {
+	# -- this is redundant, but here for safety ---
+	cd $WORK_ROOT
+
+	if [ -d $CP ]; then
+		vecho 1 "      removing temporary directory $WORK_ROOT/$CP"
+		rm -rf $CP
+	fi
+}
+
 # === Master Build Function =================================================
 
 # --- build phase ---
@@ -131,7 +160,11 @@ portia_build() {
 
 	# --- pack up sources and drop the tarball in distfiles ---
 	mkdir -p "$DISTFILES_DIR"
-	cd "$STAGE_DIR"; vrun 0 "   generating portia distfile" src_pack
+	cd "$STAGE_DIR"; vrun 0 "   generating distfile" src_pack
+
+	# --- post build and cleanup ---
+	cd "$STAGE_DIR"; vrun 0 "   running user-defined post-build scripts" src_post
+	cd "$WORK_ROOT;  vrun 0 "   cleaning up" src_cleanup
 
 	vecho 0 "build complete"
 }
