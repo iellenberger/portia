@@ -113,7 +113,7 @@ If you define `TMP_ROOT=/mytmp`, `WORK_ROOT` will have the value `/mytmp/portia`
 > 
 > The local package repository cache for a particular package.
 
-#### `ETC_PATH`, `EP`
+##### `ETC_PATH`, `EP`
 > **Default:** `PORTIA_ROOT/etc/portia`
 > 
 > Configuration files for this installation of Portia.
