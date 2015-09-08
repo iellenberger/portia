@@ -128,6 +128,8 @@ sub sync {
 			$self->syncFull;
 		}
 		# --- sparse sync ---
+		#! Not sure what sparse's purpose is. Can't find where a sync'ed repo with
+		#! only the .list file is used for anything. We certainly can't search it.
 		when ('sparse') {
 			vprint 1, ">sparse sync\n";
 			vprint 2, ">using URI $self->{uri}\n";
