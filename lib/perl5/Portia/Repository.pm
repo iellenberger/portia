@@ -128,6 +128,8 @@ sub sync {
 			$self->syncFull;
 		}
 		# --- sparse sync ---
+		#! Not sure what sparse's purpose is. Can't find where a sync'ed repo with
+		#! only the .list file is used for anything. We certainly can't search it.
 		when ('sparse') {
 			vprint 1, ">sparse sync\n";
 			vprint 2, ">using URI $self->{uri}\n";
@@ -147,7 +149,6 @@ sub sync {
 }
 
 # --- do a full sync ---
-#! TODO: need to trace code - not sure this ever gets executed.
 sub syncFull {
 	my $self = shift;
 
@@ -163,7 +164,7 @@ sub syncFull {
 	my $cmd = "rsync -a". (verbosity >= 4 ? 'v ' : ' ') ." --delete --exclude '*/.tgz' ";  # default is rsync
 	given ($uri->scheme) {
 		# --- rsync native, via ssh or local filesystem ---
-		when ('rsync') { $cmd .= $uri->uri ."/* ."; }
+		when ('rsync') { $cmd .= $uri->host .":". $uri->path ."/* ."; } #! TODO: add username
 		when ('ssh')   { $cmd .= $uri->host .":". $uri->path ."/* ."; } #! TODO: add username
 		when ('file')  { $cmd .= $uri->path ."/* ."; }
 
@@ -268,7 +269,7 @@ sub _syncFile {
 	my $cmd = "rsync ". (verbosity >= 4 ? '-v ' : '');  # default is rsync
 	given ($uri->scheme) {
 		# --- rsync native, via ssh or local filesystem ---
-		when ('rsync') { $cmd .= $uri->uri ."$file ."; }
+		when ('rsync') { $cmd .= $uri->host .":". $uri->path ."$file ."; } #! TODO: add username
 		when ('ssh')   { $cmd .= $uri->host .":". $uri->path ."$file ."; } #! TODO: add username
 		when ('file')  { $cmd .= $uri->path ."$file ."; }
 

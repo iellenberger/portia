@@ -30,6 +30,7 @@ sub new {
 	$self->name($name);
 	$INSTANCES->{$name} = $self;
 
+
 	# --- load versions if a repo was specified ---
 	$self->loadVersions($args->{repo})
 		if $args->{repo};
@@ -70,7 +71,7 @@ sub sources    { load Portia::Sources }
 sub loadVersions {
 	my ($self, $repo) = @_;
 
-	# --- load all version of this package fir the given repo ---
+	# --- load all version of this package for the given repo ---
 	my @versions = loadAll Portia::Version(
 		Repo    => $repo,
 		Package => $self->name,

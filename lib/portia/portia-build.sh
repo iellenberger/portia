@@ -164,7 +164,7 @@ portia_build() {
 
 	# --- post build and cleanup ---
 	cd "$STAGE_DIR"; vrun 0 "   running user-defined post-build scripts" src_post
-	cd "$WORK_ROOT;  vrun 0 "   cleaning up" src_cleanup
+	cd "$WORK_ROOT"; vrun 0 "   cleaning up" src_cleanup
 
 	vecho 0 "build complete"
 }

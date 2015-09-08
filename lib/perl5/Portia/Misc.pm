@@ -16,6 +16,7 @@ use FindBin qw( $RealBin );
 use iTools::URI;
 use iTools::System qw( mkdir system chdir pushdir popdir command );
 use iTools::Verbosity qw( vprint verbosity );
+use Portia::Tools qw( indent );
 
 use strict;
 use warnings;
@@ -87,7 +88,6 @@ sub pushUpload {
 	# --- find the push repo ---
 	my $repo = findRepo Portia::Sources(
 		tags  => 'push',
-		sync  => 'live',
 		name  => $reponame,
 	);
 
@@ -115,7 +115,7 @@ sub pushUpload {
 	vprint 0, "Uploading ". ($tarfile =~ /([^\/]*)$/)[0] ." to $reponame\n";
 
 	# --- make sure the repo has a valid URI ---
-	my $uri = new iTools::URI(URI => $repo->{uri});
+	my $uri = new iTools::URI(URI => $repo->{pushuri} || $repo->{uri});
 	my ($scheme, $repopath) = ($uri->scheme || '', $uri->path || '');
 
 	# --- 'file' scheme ---
