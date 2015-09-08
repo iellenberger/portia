@@ -115,7 +115,7 @@ sub pushUpload {
 	vprint 0, "Uploading ". ($tarfile =~ /([^\/]*)$/)[0] ." to $reponame\n";
 
 	# --- make sure the repo has a valid URI ---
-	my $uri = new iTools::URI(URI => $repo->{uri});
+	my $uri = new iTools::URI(URI => $repo->{pushuri} || $repo->{uri});
 	my ($scheme, $repopath) = ($uri->scheme || '', $uri->path || '');
 
 	# --- 'file' scheme ---
