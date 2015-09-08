@@ -88,7 +88,6 @@ sub pushUpload {
 	# --- find the push repo ---
 	my $repo = findRepo Portia::Sources(
 		tags  => 'push',
-		sync  => 'live',
 		name  => $reponame,
 	);
 
