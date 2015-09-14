@@ -22,7 +22,7 @@ src_fetch() {
 }
 
 src_unpack() {
-	tar xzf $DOWNLOAD_DIR/$PVR.tgz --strip-components 1
+	tar xzf $WORK_DIR/$PVR.tgz --strip-components 1
 }
 
 src_install() {

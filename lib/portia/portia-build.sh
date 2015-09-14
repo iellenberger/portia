@@ -12,7 +12,7 @@ source $LIB_ROOT/misc-functions.sh
 
 # --- fetch the source tarballs ---
 # fetches the source tarballs if defined in SRCFILES
-# Initial working directory: DOWNLOAD_DIR
+# Initial working directory: WORK_DIR
 src_fetch() {
 	# --- Add the default filename if SRCFILES is unset ---
 	if [ -z ${SRCFILES+unset} ]; then SRCFILES=$PVR-src.tgz; fi
@@ -36,8 +36,8 @@ src_fetch() {
 		# --- fetch the source file ---
 		vecho 1 "      fetching $_SRCFILE"
 		vecho 2 "         from $_SOURCE"
-		vecho 2 "         to $DOWNLOAD_DIR"
-		acquire --noclobber -v $_SOURCE $DOWNLOAD_DIR
+		vecho 2 "         to $WORK_DIR"
+		acquire --noclobber -v $_SOURCE $WORK_DIR
 
 		# --- die on error ---
 		if [ $? -gt 0 ]; then
@@ -50,30 +50,20 @@ src_fetch() {
 }
 
 # --- unpack the source tarballs ---
-# This function is used to unpack all the sources in DOWNLOAD_DIR to WORK_DIR.
+# This function is used to unpack all the sources in WORK_DIR.
 # Initial working directory: WORK_DIR
-#! TODO: make this much more sophisticated, unpacking by extension and moving the rest
+#! TODO: make this much more sophisticated, unpacking by extension
 src_unpack() {
 	# --- localize variables ---
 	local _FILE
 
 	# --- unpack each source tarball ---
-	for _FILE in `find $DOWNLOAD_DIR -maxdepth 1 -type f -name "*.tgz" -o -name "*.tar.gz"`; do
+	for _FILE in `find $WORK_DIR -maxdepth 1 -type f -name "*.tgz" -o -name "*.tar.gz"`; do
 		#! TODO: implement unpack
 		#unpack $_FILE
 		vecho 1 "      unpacking $_FILE"
 		tar xzf $_FILE
 		rm $_FILE
-	done
-
-	# --- move everything else to WORK_DIR ---
-	vecho 1 "      moving remaining files to $WORK_DIR"
-	for _FILE in `find $DOWNLOAD_DIR -maxdepth 1`; do
-
-		# --- don't move the download dir itself ---
-		if [[ $_FILE == $DOWNLOAD_DIR ]]; then continue; fi
-
-		mv $_FILE $WORK_DIR
 	done
 }
 
@@ -137,13 +127,10 @@ src_cleanup() {
 portia_build() {
 	vecho 0 "Building $CATEGORY/$PVR"
 
-	# --- fetch the source ---
-	cd_empty "$DOWNLOAD_DIR" DOWNLOAD_DIR
-	vrun 0 "   fetching source" src_fetch
-
-	# --- unpack the sources --- 
+	# --- fetch and unpack the sources --- 
 	cd_empty "$WORK_DIR" WORK_DIR
-	vrun 0 "   unpacking source" src_unpack
+	vrun 0 "   fetching source" src_fetch
+	cd "$WORK_DIR"; vrun 0 "   unpacking source" src_unpack
 
 	# --- prepare the sources --- 
 	cd "$WORK_DIR"; vrun 0 "   preparing source" src_prepare
@@ -155,8 +142,7 @@ portia_build() {
 
 	# --- install to staging area ---
 	cd_empty "$STAGE_DIR" STAGE_DIR
-	cd "$WORK_DIR";
-	vrun 0 "   installing to staging area" src_install
+	cd "$WORK_DIR"; vrun 0 "   installing to staging area" src_install
 
 	# --- pack up sources and drop the tarball in distfiles ---
 	mkdir -p "$DISTFILES_DIR"

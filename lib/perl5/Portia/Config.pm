@@ -71,6 +71,8 @@ sub maps {
 
 		# --- a mapping template for all envvars ---
 		# format: shortname, longname, default
+		#! DEPRECATED: DOWNLOAD_DIR is a synonym for WORK_DIR.
+		#!    use of DOWNLOAD_DIR is deprecated.
 		my @template = map { $_ eq 'undef' ? undef : $_ } qw(
 			undef  OS_NAME               undef
 			undef  OS_DIST               undef
@@ -94,7 +96,7 @@ sub maps {
 			TR       TMP_ROOT            PORTIA_ROOT/var/tmp
 			WR         WORK_ROOT         TMP_ROOT/portia
 			PW           PWORK_DIR       WORK_ROOT/CATEGORY/PACKAGE
-			DL             DOWNLOAD_DIR  PWORK_DIR/download
+			DL             DOWNLOAD_DIR  PWORK_DIR/work
 			WD             WORK_DIR      PWORK_DIR/work
 			SD             STAGE_DIR     PWORK_DIR/stage
 

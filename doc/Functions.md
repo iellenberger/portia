@@ -33,10 +33,10 @@ Feel free to browse the libraries to fully understand how each function operates
 
 ##### `src_fetch` - download source archive(s)
 
-> **Default Action**: Download SRCFILES to DOWNLOAD\_DIR<br>
-> **Initial Working Directory**: DOWNLOAD\_DIR
+> **Default Action**: Download SRCFILES to WORK\_DIR<br>
+> **Initial Working Directory**: WORK\_DIR
 > 
-> If you have defined SRCFILES in your pbuild, `src_fetch` downloads these files and places them in DOWNLOAD\_DIR.
+> If you have defined SRCFILES in your pbuild, `src_fetch` downloads these files and places them in WORK\_DIR.
 > 
 > SRCFILES can be any combination of space separated filenames or URIs.
 > They will be downloaded in the sequence they are given.
@@ -46,10 +46,10 @@ Feel free to browse the libraries to fully understand how each function operates
 
 ##### `src_unpack` - unpack source archive(s)
 
-> **Default Action**: Unpack tarballs in DOWNLOAD\_DIR to WORK\_DIR<br>
+> **Default Action**: Unpack tarballs in WORK\_DIR<br>
 > **Initial Working Directory**: WORK\_DIR
 > 
-> `src_unpack` infs all files at the top level of DOWNLOAD\_DIR and unpacks them in WORK\_DIR.
+> `src_unpack` unpacks tarballs found at the top level of WORK\_DIR.
 > At present, the default functionality only supports tar-gzip archives.
 > 
 > It is considered best practice to build your archives with a unique top level directory.
@@ -124,15 +124,15 @@ Feel free to browse the libraries to fully understand how each function operates
 
 ##### `bin_fetch` - download binary archive(s)
 
-> **Default Action**: Download BINFILES to DOWNLOAD\_DIR<br>
-> **Initial Working Directory**: DOWNLOAD\_DIR
+> **Default Action**: Download BINFILES to WORK\_DIR<br>
+> **Initial Working Directory**: WORK\_DIR
 >
 > This function works almost identically to `src_fetch`,
 > except that it uses the variable BINFILES as its file list.
 
 ##### `bin_unpack` - unpack source archive(s)
 
-> **Default Action**: Unpack tarballs in DOWNLOAD\_DIR to STAGE\_DIR <br>
+> **Default Action**: Unpack tarballs in WORK\_DIR to STAGE\_DIR <br>
 > **Initial Working Directory**: STAGE\_DIR
 >
 > This function works identically to `src_unpack`.

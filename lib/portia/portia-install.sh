@@ -12,7 +12,7 @@ source $LIB_ROOT/misc-functions.sh
 
 # --- fetch the binary tarballs ---
 # fetches the binary tarballs if defined in BINFILES
-# Initial working directory: DOWNLOAD_DIR
+# Initial working directory: WORK_DIR
 bin_fetch() {
 	# --- Add the default filename if BINFILES is unset ---
 	if [ -z ${BINFILES+unset} ]; then BINFILES=$PVR.tgz; fi
@@ -36,8 +36,8 @@ bin_fetch() {
 		# --- fetch the source file ---
 		vecho 1 "      fetching $_BINFILE"
 		vecho 2 "         from $_SOURCE"
-		vecho 2 "         to $DOWNLOAD_DIR"
-		acquire --noclobber -q $_SOURCE $DOWNLOAD_DIR
+		vecho 2 "         to $WORK_DIR"
+		acquire --noclobber -q $_SOURCE $WORK_DIR
 
 		# --- die on error ---
 		if [ $? -gt 0 ]; then
@@ -50,7 +50,7 @@ bin_fetch() {
 }
 
 # --- unpack the binary tarballs ---
-# This function is used to unpack all the binaries in DOWNLOAD_DIR to STAGE_DIR.
+# This function is used to unpack all the binaries in WORK_DIR to STAGE_DIR.
 # Initial working directory: STAGE_DIR
 bin_unpack() {
 	# --- localize variables ---
@@ -58,7 +58,7 @@ bin_unpack() {
 
 	# --- unpack each binary tarball ---
 	vecho 2 "         in" $( pwd )
-	for _FILE in `find $DOWNLOAD_DIR -maxdepth 1 -type f`; do
+	for _FILE in `find $WORK_DIR -maxdepth 1 -type f`; do
 		#! TODO: implement unpack
 		#unpack $_FILE
 		vecho 1 "      unpacking $_FILE"
@@ -170,7 +170,7 @@ portia_install() {
 	cd_empty "$PWORK_DIR" PWORK_DIR
 
 	# --- fetch the binaries ---
-	mkdir -p "$DOWNLOAD_DIR"; cd "$DOWNLOAD_DIR"
+	mkdir -p "$WORK_DIR"; cd "$WORK_DIR"
 	vrun 0 "   fetching binaries" bin_fetch
 
 	# --- unpack the binaries --- 

@@ -46,7 +46,6 @@ EP     ETC_PATH            PORTIA_ROOT/etc/portia
 TR     TMP_ROOT            PORTIA_ROOT/var/tmp
 WR       WORK_ROOT         TMP_ROOT/portia
 PW         PWORK_DIR       WORK_ROOT/CATEGORY/PACKAGE
-DL           DOWNLOAD_DIR  PWORK_DIR/download
 WD           WORK_DIR      PWORK_DIR/work
 SD           STAGE_DIR     PWORK_DIR/stage
 
@@ -132,11 +131,6 @@ If you define `TMP_ROOT=/mytmp`, `WORK_ROOT` will have the value `/mytmp/portia`
 > **Default:** `WORK_ROOT/CATEGORY/PACKAGE`
 > 
 > Root directory for package-specific work.
-
-##### `DOWNLOAD_DIR`, `DL`
-> **Default:** `PWORK_DIR/download`
-> 
-> Temporary download location for `*_fetch()` operations.
 
 ##### `WORK_DIR`, `WD`
 > **Default:** `PWORK_DIR/work`
