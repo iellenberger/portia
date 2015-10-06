@@ -91,6 +91,9 @@ sub maps {
 			DBD          DB_DIR          DB_ROOT/CATEGORY/PACKAGE
 			DR         DISTFILES_ROOT    PORTIA_LIB/distfiles
 			DD           DISTFILES_DIR   DISTFILES_ROOT/CATEGORY/PACKAGE
+			undef      PACKAGES_ROOT     PORTIA_LIB/packages
+			undef        PACKAGES_DIR    PACKAGES_ROOT/CATEGORY/PACKAGE
+
 			EP       ETC_PATH            undef
 
 			TR       TMP_ROOT            PORTIA_ROOT/var/tmp
@@ -106,6 +109,8 @@ sub maps {
 
 			undef  PBUILD_DIR            undef
 			undef  PBUILD_FILE           undef
+			undef  PBUILD_ROOT           PBUILD_DIR
+			undef  FILES_ROOT            PBUILD_ROOT/files
 
 			P      PACKAGE               undef
 			V      VERSION               undef
@@ -380,6 +385,13 @@ sub resolve {
 		if ($key eq 'VR' && !$resolved && $self->resolve('V')) {
 			$resolved = 1;
 			$self->softSet(VR => $self->{V});
+			next;
+		}
+
+		# --- special case for PBUILD_ROOT ---
+		if ($key eq 'PBUILD_ROOT' && !$resolved && $self->resolve('PACKAGES_DIR')) {
+			$resolved = 1;
+			$self->softSet(PBUILD_ROOT => $self->{PACKAGES_DIR});
 			next;
 		}
 
