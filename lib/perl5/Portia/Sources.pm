@@ -58,6 +58,7 @@ sub dumpConfig {
 sub sync {
 	my $self = _self(shift);
 	foreach my $repo (values %$self) {
+		next if $repo->matches(tags => 'ignore');
 		vprint 0, "Syncing ". $repo->name ."\n";
 		$repo->sync;
 	}
