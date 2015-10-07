@@ -238,7 +238,7 @@ sub _loadOS {
 				$osver = ($release =~ /release (\S*)/)[0] || '';
 			} elsif (-e '/etc/issue') {
 				my $release = readfile('/etc/issue');
-				if ($release =~ /^Ubuntu (\S*?)/) {
+				if ($release =~ /^Ubuntu (\S*)/) {
 					$dist = 'ubuntu';
 					$osver = $1;
 				}
