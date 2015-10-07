@@ -10,3 +10,6 @@ lib/perl5/iTools
 # --- dirs generated during build and test ---
 /tmp
 /var
+
+# --- annoying OS-X files ---
+.DS_Store
