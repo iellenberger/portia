@@ -236,11 +236,18 @@ sub _loadOS {
 				$dist = $Config{osname} =~ /centos/ ? 'centos' : 'redhat';
 				my $release = readfile('/etc/redhat-release');
 				$osver = ($release =~ /release (\S*)/)[0] || '';
+			} elsif (-e '/etc/issue') {
+				my $release = readfile('/etc/issue');
+				if ($release =~ /^Ubuntu (\S*?)/) {
+					$dist = 'ubuntu';
+					$osver = $1;
+				}
 			}
+
 			last;
 		};
 
-		#! TODO: Debian, Ubuntu, other distros
+		#! TODO: Debian, other distros
 	};
 
 	$self->hardSet(OS_DIST => $dist, OS_VERSION => $osver);
