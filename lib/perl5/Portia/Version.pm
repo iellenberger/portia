@@ -178,6 +178,13 @@ sub load {
 	my $pname = $vhash->{PACKAGE}  || $args->{pkg};
 	my $vname = ($args->{file} =~ /^$pname-(.*?).pbuild$/)[0] || $vhash->{VERSION} || $args->{version};
 
+	# --- safety mechanism: these must be defined ---
+	# NOTE: this is in response to the 'rm -rf ~' issue for bad pbuilds
+	unless ($cname && $pname) {
+		print "No CATEGORY or PACKAGE defined for this package/build";
+		exit;
+	}
+
 	# --- set some export defaults ---
 	$vhash->{CATEGORY} ||= $cname;
 	$vhash->{PACKAGE}  ||= $pname;
