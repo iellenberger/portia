@@ -1,4 +1,4 @@
-#!/usr/bin/env perl -w
+#!/usr/bin/env perl
 our $VERSION="0.1.1";
 
 # --- always library path first ---
