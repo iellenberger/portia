@@ -1,5 +1,5 @@
 #!/usr/bin/env perl -w
-our $VERSION="0.1.0";
+our $VERSION="0.1.1";
 
 # --- always library path first ---
 use FindBin qw( $Bin $RealBin );

@@ -106,7 +106,7 @@ sub interpolate {
 	my $text = shift;                    # text to interpolate values into
 	my $hash = shift || \%ENV;           # interpolation hash, default to %ENV
 	while (my ($k, $v) = each %$hash) {  # loop through interpolation hash
-		$text =~ s/\${$k}/$v/msg;         # replace keys in text with hash values
+		$text =~ s/\$\{$k}/$v/msg;        # replace keys in text with hash values
 	}
 	return $text;                        # return rewritten text
 }
