@@ -147,6 +147,18 @@ bin_install() {
 	ln -f $DB_DIR/$PVR.mf $DB_DIR/current.mf
 }
 
+# --- post-install cleanup ---
+# Initial working directory: WORK_ROOT
+bin_cleanup() {
+	# -- this is redundant, but here for safety ---
+	cd $WORK_ROOT
+
+	if [ -d $CP ]; then
+		vecho 1 "      removing temporary directory $WORK_ROOT/$CP"
+		rm -rf $CP
+	fi
+}
+
 # --- post-install live filesystem modification script ---
 # All modifications required on the live-filesystem after the
 # package is merged should be placed here. Also commentary for the user  
@@ -186,6 +198,7 @@ portia_install() {
 	cd "$PWORK_DIR"; vrun 0 "   generating manifests" bin_manifest
 	cd "$PWORK_DIR"; vrun 0 "   running installation script" bin_install
 	cd "$PWORK_DIR"; vrun 0 "   running post-installaion script" bin_postinstall
+	cd "$WORK_ROOT"; vrun 0 "   cleaning up" bin_cleanup
 
 	vecho 0 "$PVR installed"
 }
