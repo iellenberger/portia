@@ -83,7 +83,8 @@ bin_manifest() {
 	mkdir_safe $INSTALL_ROOT 'INSTALL_ROOT'
 
 	# --- symlink INSTALL_ROOT to make commands cleaner ---
-	ln -s $INSTALL_ROOT live
+	#! commenting this out as it cause some problems and had no functional benefit
+	#ln -s $INSTALL_ROOT live
 
 	# --- generate the live and stage manifests ---
 	vecho 2 "         in" $( pwd )
