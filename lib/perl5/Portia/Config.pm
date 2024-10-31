@@ -15,10 +15,6 @@ use Storable qw( dclone );
 use strict;
 use warnings;
 
-# --- remove warnings for switch in Perl >= 5.18 ---
-#! TODO: need to watch if this feature is deprecaated in future versions of Perl
-use feature qw( switch ); no if $] >= 5.018, warnings => "experimental::smartmatch";
-
 # === Class-Level Declarations ==============================================
 # --- persistant instance of object ---
 our $INSTANCE;

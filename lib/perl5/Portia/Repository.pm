@@ -16,10 +16,6 @@ use Portia::Tools qw( indent match );
 use strict;
 use warnings;
 
-# --- remove warnings for switch in Perl >= 5.18 ---
-#! TODO: need to watch if this feature is deprecaated in future versions of Perl
-use feature qw( switch ); no if $] >= 5.018, warnings => "experimental::smartmatch";
-
 # === Constructor and Construtor-like Methods ===============================
 # --- new, blank object ---
 sub new {
@@ -116,35 +112,34 @@ sub sync {
 	my $self = shift;
 
 	# --- sync repo based on sync type ---
-	for ($self->{sync}) {
-		# --- live repository ---
-		if ('live') {
-			vprint 1, ">no sync required (live repository)\n";
-		}
-		# --- full sync ---
-		elsif ('full') {
-			vprint 1, ">full sync\n";
-			vprint 2, ">using URI $self->{uri}\n";
-			$self->syncFull;
-		}
-		# --- sparse sync ---
-		#! Not sure what sparse's purpose is. Can't find where a sync'ed repo with
-		#! only the .list file is used for anything. We certainly can't search it.
-		elsif ('sparse') {
-			vprint 1, ">sparse sync\n";
-			vprint 2, ">using URI $self->{uri}\n";
-			$self->options->{deep} ? $self->syncDeep : $self->syncList;
-		}
-		# --- deep sync ---
-		elsif ('deep') {
-			vprint 1, ">deep sync\n";
-			vprint 2, ">using URI $self->{uri}\n";
-			$self->syncDeep;
-		}
 
-		else {
-			vprint 1, ">". color("y", "could not sync $self->{name}, unknown sync type '$self->{sync}'") ."\n";
-		}
+	# --- live repository ---
+	if ($self->{sync} eq 'live') {
+		vprint 1, ">no sync required (live repository)\n";
+	}
+	# --- full sync ---
+	elsif ($self->{sync} eq 'full') {
+		vprint 1, ">full sync\n";
+		vprint 2, ">using URI $self->{uri}\n";
+		$self->syncFull;
+	}
+	# --- sparse sync ---
+	#! Not sure what sparse's purpose is. Can't find where a sync'ed repo with
+	#! only the .list file is used for anything. We certainly can't search it.
+	elsif ($self->{sync} eq 'sparse') {
+		vprint 1, ">sparse sync\n";
+		vprint 2, ">using URI $self->{uri}\n";
+		$self->options->{deep} ? $self->syncDeep : $self->syncList;
+	}
+	# --- deep sync ---
+	elsif ($self->{sync} eq 'deep') {
+		vprint 1, ">deep sync\n";
+		vprint 2, ">using URI $self->{uri}\n";
+		$self->syncDeep;
+	}
+
+	else {
+		vprint 1, ">". color("y", "could not sync $self->{name}, unknown sync type '$self->{sync}'") ."\n";
 	}
 }
 
@@ -162,30 +157,28 @@ sub syncFull {
 
 	# --- generate command based on scheme ---
 	my $cmd = "rsync -a". (verbosity >= 4 ? 'v ' : ' ') ." --delete --exclude '*/.tgz' ";  # default is rsync
-	for ($uri->scheme) {
-		# --- rsync native, via ssh or local filesystem ---
-		if    ('rsync') { $cmd .= $uri->host .":". $uri->path ."/* ."; } #! TODO: add username
-		elsif ('ssh')   { $cmd .= $uri->host .":". $uri->path ."/* ."; } #! TODO: add username
-		elsif ('file')  { $cmd .= $uri->path ."/* ."; }
+	# --- rsync native, via ssh or local filesystem ---
+	if    ($uri->scheme eq 'rsync') { $cmd .= $uri->host .":". $uri->path ."/* ."; } #! TODO: add username
+	elsif ($uri->scheme eq 'ssh')   { $cmd .= $uri->host .":". $uri->path ."/* ."; } #! TODO: add username
+	elsif ($uri->scheme eq 'file')  { $cmd .= $uri->path ."/* ."; }
 
-		# --- otherwise wget a tarball ---
-		else {
-			$cmd = '';  # clear this so system won't run later
+	# --- otherwise wget a tarball ---
+	else {
+		$cmd = '';  # clear this so system won't run later
 
-			# --- get the tarball ---
-			my $content = get $uri->uri ."/.tgz";
-			break unless $content;
+		# --- get the tarball ---
+		my $content = get $uri->uri ."/.tgz";
+		last unless $content;
 
-			# --- remove everything ---
-			system "rm -rf ../packages/* ../packages/.list ../packages/.tgz";
+		# --- remove everything ---
+		system "rm -rf ../packages/* ../packages/.list ../packages/.tgz";
 
-			# --- write and unpack the tarball ---
-			writefile ".tgz", $content;
-			system "
-				$ENV{TAR} x". (verbosity >= 4 ? 'v' : '') ."zf .tgz
-				rm -f .tgz
-			";
-		}
+		# --- write and unpack the tarball ---
+		writefile ".tgz", $content;
+		system "
+			$ENV{TAR} x". (verbosity >= 4 ? 'v' : '') ."zf .tgz
+			rm -f .tgz
+		";
 	}
 
 	# --- execute the command, ensure no fatal errors ---
@@ -356,21 +349,19 @@ sub matches {
 		# --- ignore undef and blank values ---
 		next unless defined $value && $value ne '';
 
-		for (lc $key) {
-			# --- query repo's tags ---
-			if ('tags') {
-				foreach my $query (ref $value ? @$value : $value) {
-					return unless match($query, $self->{tags});
-				}
+		# --- query repo's tags ---
+		if (lc $key eq 'tags') {
+			foreach my $query (ref $value ? @$value : $value) {
+				return unless match($query, $self->{tags});
 			}
-			elsif ('name') {
-				return unless $self->name eq $value;
-			}
-			# --- query all other keys for the repo ---
-			else {
-				return unless exists $self->{$key} && defined $self->{$key};
-				return unless match($value, $self->{$key});
-			}
+		}
+		elsif (lc $key eq 'name') {
+			return unless $self->name eq $value;
+		}
+		# --- query all other keys for the repo ---
+		else {
+			return unless exists $self->{$key} && defined $self->{$key};
+			return unless match($value, $self->{$key});
 		}
 	}
 
