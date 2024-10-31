@@ -90,20 +90,20 @@ my $repo = $config->selectRepo($options->{repo})
 # === Main Body of Code =====================================================
 
 # --- process commands ---
-given ($command) {
-	when ('dump')    { dumpConfig(@ARGV) }
-	when ('sync')    { sync() }
-	when ('search')  { search(@ARGV) }
-	when ('show')    { show(@ARGV) }
-	when ('push')    { pushBuild(@ARGV) }
-	when ('flush')   { flushCaches() }
-	when ('build')   { build(@ARGV) }
-	when ('install') { install(@ARGV) }
+for ($command) {
+	if    ('dump')    { dumpConfig(@ARGV) }
+	elsif ('sync')    { sync() }
+	elsif ('search')  { search(@ARGV) }
+	elsif ('show')    { show(@ARGV) }
+	elsif ('push')    { pushBuild(@ARGV) }
+	elsif ('flush')   { flushCaches() }
+	elsif ('build')   { build(@ARGV) }
+	elsif ('install') { install(@ARGV) }
 
-	when ('reindex')       { cmdReindex(@ARGV) }
-	when ('processupload') { cmdProcessUpload(@ARGV) }
+	elsif ('reindex')       { cmdReindex(@ARGV) }
+	elsif ('processupload') { cmdProcessUpload(@ARGV) }
 
-	default          { $options->usage("unknown command '$command'") }
+	else { $options->usage("unknown command '$command'") }
 }
 
 exit 0;
