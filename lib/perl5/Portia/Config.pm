@@ -37,9 +37,9 @@ sub new {
 
 	# --- parse incoming parameters ---
 	while (my ($key, $value) = each %args) {
-		given (lc $key) {
-			when (m/^import/) { $self->importEnv($value) }
-			default           { $self->{$key} = $value }
+		for (lc $key) {
+			if (m/^import/) { $self->importEnv($value) }
+			else            { $self->{$key} = $value }
 		}
 	}
 

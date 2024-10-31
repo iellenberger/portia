@@ -23,14 +23,14 @@ sub new {
 
    # --- parse incoming parameters ---
 	while (my ($key, $value) = each %args) {
-		given (lc $key) {
+		for (lc $key) {
 			#! TODO: make these required
-			when (/^repo/)         { $self->rname($value) }   
-			when (/^(?:pack|pkg)/) { $self->pname($value) }   
-			when (/^(?:name|ver)/) { $self->vname($value) }   
-			when (/^file/)         { $self->file($value) }   
-			when (/^tag/)          { $self->tags(@$value) }   
-			default                { $self->{$key} = $value }
+			if    (/^repo/)         { $self->rname($value) }   
+			elsif (/^(?:pack|pkg)/) { $self->pname($value) }   
+			elsif (/^(?:name|ver)/) { $self->vname($value) }   
+			elsif (/^file/)         { $self->file($value) }   
+			elsif (/^tag/)          { $self->tags(@$value) }   
+			else                    { $self->{$key} = $value }
 		}
 	}
 

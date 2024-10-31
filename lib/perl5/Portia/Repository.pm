@@ -27,9 +27,9 @@ sub new {
 
 	# --- parse incoming parameters ---
 	while (my ($key, $value) = each %args) {
-		given (lc $key) {
-			when (m/^(?:repo|name)/) { $self->rname($value) }
-			default                  { $self->{$key} = $value }
+		for (lc $key) {
+			if (m/^(?:repo|name)/) { $self->rname($value) }
+			else                   { $self->{$key} = $value }
 		}
 	}
 
@@ -116,13 +116,13 @@ sub sync {
 	my $self = shift;
 
 	# --- sync repo based on sync type ---
-	given ($self->{sync}) {
+	for ($self->{sync}) {
 		# --- live repository ---
-		when ('live') {
+		if ('live') {
 			vprint 1, ">no sync required (live repository)\n";
 		}
 		# --- full sync ---
-		when ('full') {
+		elsif ('full') {
 			vprint 1, ">full sync\n";
 			vprint 2, ">using URI $self->{uri}\n";
 			$self->syncFull;
@@ -130,19 +130,19 @@ sub sync {
 		# --- sparse sync ---
 		#! Not sure what sparse's purpose is. Can't find where a sync'ed repo with
 		#! only the .list file is used for anything. We certainly can't search it.
-		when ('sparse') {
+		elsif ('sparse') {
 			vprint 1, ">sparse sync\n";
 			vprint 2, ">using URI $self->{uri}\n";
 			$self->options->{deep} ? $self->syncDeep : $self->syncList;
 		}
 		# --- deep sync ---
-		when ('deep') {
+		elsif ('deep') {
 			vprint 1, ">deep sync\n";
 			vprint 2, ">using URI $self->{uri}\n";
 			$self->syncDeep;
 		}
 
-		default {
+		else {
 			vprint 1, ">". color("y", "could not sync $self->{name}, unknown sync type '$self->{sync}'") ."\n";
 		}
 	}
@@ -162,14 +162,14 @@ sub syncFull {
 
 	# --- generate command based on scheme ---
 	my $cmd = "rsync -a". (verbosity >= 4 ? 'v ' : ' ') ." --delete --exclude '*/.tgz' ";  # default is rsync
-	given ($uri->scheme) {
+	for ($uri->scheme) {
 		# --- rsync native, via ssh or local filesystem ---
-		when ('rsync') { $cmd .= $uri->host .":". $uri->path ."/* ."; } #! TODO: add username
-		when ('ssh')   { $cmd .= $uri->host .":". $uri->path ."/* ."; } #! TODO: add username
-		when ('file')  { $cmd .= $uri->path ."/* ."; }
+		if    ('rsync') { $cmd .= $uri->host .":". $uri->path ."/* ."; } #! TODO: add username
+		elsif ('ssh')   { $cmd .= $uri->host .":". $uri->path ."/* ."; } #! TODO: add username
+		elsif ('file')  { $cmd .= $uri->path ."/* ."; }
 
 		# --- otherwise wget a tarball ---
-		default {
+		else {
 			$cmd = '';  # clear this so system won't run later
 
 			# --- get the tarball ---
@@ -267,14 +267,14 @@ sub _syncFile {
 
 	# --- generate command based on scheme ---
 	my $cmd = "rsync ". (verbosity >= 4 ? '-v ' : '');  # default is rsync
-	given ($uri->scheme) {
+	for ($uri->scheme) {
 		# --- rsync native, via ssh or local filesystem ---
-		when ('rsync') { $cmd .= $uri->host .":". $uri->path ."$file ."; } #! TODO: add username
-		when ('ssh')   { $cmd .= $uri->host .":". $uri->path ."$file ."; } #! TODO: add username
-		when ('file')  { $cmd .= $uri->path ."$file ."; }
+		if    ('rsync') { $cmd .= $uri->host .":". $uri->path ."$file ."; } #! TODO: add username
+		elsif ('ssh')   { $cmd .= $uri->host .":". $uri->path ."$file ."; } #! TODO: add username
+		elsif ('file')  { $cmd .= $uri->path ."$file ."; }
 
 		# --- otherwise wget a tarball ---
-		default {
+		else {
 			$cmd = '';  # clear this so system won't run later
 			my $content = get $uri->uri . $file;
 			if ($content) {
@@ -356,18 +356,18 @@ sub matches {
 		# --- ignore undef and blank values ---
 		next unless defined $value && $value ne '';
 
-		given (lc $key) {
+		for (lc $key) {
 			# --- query repo's tags ---
-			when ('tags') {
+			if ('tags') {
 				foreach my $query (ref $value ? @$value : $value) {
 					return unless match($query, $self->{tags});
 				}
 			}
-			when ('name') {
+			elsif ('name') {
 				return unless $self->name eq $value;
 			}
 			# --- query all other keys for the repo ---
-			default {
+			else {
 				return unless exists $self->{$key} && defined $self->{$key};
 				return unless match($value, $self->{$key});
 			}
